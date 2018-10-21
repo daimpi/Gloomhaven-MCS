@@ -1,5 +1,5 @@
-globals [g-catsheets g-amc-deck g-freq-record g-reshuffle?]
-turtles-own [category value rolling? special? shuffle?]
+globals [g-catsheets g-amc-deck g-freq-record g-reshuffle? g-discard]
+turtles-own [category value rolling? special shuffle?]
 
 
 to reset
@@ -34,13 +34,14 @@ to setup
       set category item 0 cur-catsheet
       set value item 2 cur-catsheet
       set rolling? item 3 cur-catsheet
-      set special? item 4 cur-catsheet
+      set special item 4 cur-catsheet
       set shuffle? item 5 cur-catsheet
     ]
   ]
   set g-amc-deck shuffle sort turtles
   let #categories [category] of max-one-of turtles [category]
   set g-freq-record n-values #categories [0]
+  set g-discard []
 end
 
 
@@ -56,8 +57,10 @@ end
 
 to draw
   let reshuffle? false
+  let cur-attack-cards []
   ask first g-amc-deck [
     set g-amc-deck but-first g-amc-deck
+    set cur-attack-cards lput self cur-attack-cards
     if shuffle? or empty? g-amc-deck [
      set reshuffle? true
     ]
@@ -76,39 +79,39 @@ end
 
 to-report standard_x0
   ; category, #of cards, value, rolling?, special?, shuffle?
-  report (list 1 st_x0 0 false false true)
+  report (list 1 st_x0 0 false 0 true)
 end
 
 to-report standard_-2
-  report (list 2 st_-2 -2 false false false)
+  report (list 2 st_-2 -2 false 0 false)
 end
 
 to-report standard_-1
-  report (list 3 st_-1 -1 false false false)
+  report (list 3 st_-1 -1 false 0 false)
 end
 
 to-report standard_0
-  report (list 4 st_0 0 false false false)
+  report (list 4 st_0 0 false 0 false)
 end
 
 to-report standard_+1
-  report (list 5 st_+1 1 false false false)
+  report (list 5 st_+1 1 false 0 false)
 end
 
 to-report standard_+2
-  report (list 6 st_+2 2 false false false)
+  report (list 6 st_+2 2 false 0 false)
 end
 
 to-report standard_x2
-  report (list 7 st_x2 0 false false true)
+  report (list 7 st_x2 0 false 0 true)
 end
 
 to-report curse
-  report (list 8 curses 0 false false false)
+  report (list 8 curses 0 false 0 false)
 end
 
 to-report bless
-    report (list 9 blesses 0 false false false)
+    report (list 9 blesses 0 false 0 false)
 end
 
 
@@ -368,7 +371,7 @@ INPUTBOX
 341
 117
 sp1-freq
-3.0
+0.0
 1
 0
 Number
@@ -392,17 +395,6 @@ SWITCH
 sp1-roll
 sp1-roll
 1
-1
--1000
-
-SWITCH
-287
-224
-404
-257
-sp1-special
-sp1-special
-0
 1
 -1000
 
@@ -445,17 +437,6 @@ SWITCH
 220
 sp2-roll
 sp2-roll
-1
-1
--1000
-
-SWITCH
-467
-226
-570
-259
-sp2-special
-sp2-special
 1
 1
 -1000
@@ -724,93 +705,115 @@ sp10-roll
 1
 -1000
 
-SWITCH
-650
-213
-750
-246
-sp3-special
-sp3-special
+INPUTBOX
+290
+223
+355
+283
+sp1-special
+1.0
 1
-1
--1000
+0
+Number
 
-SWITCH
-832
-206
-949
-239
-sp4-special
-sp4-special
+INPUTBOX
+468
+225
+532
+285
+sp2-special
+2.0
 1
-1
--1000
+0
+Number
 
-SWITCH
-652
-486
-769
-519
-sp8-special
-sp8-special
+INPUTBOX
+999
+481
+1073
+541
+sp10-special
+10.0
 1
-1
--1000
+0
+Number
 
-SWITCH
-456
-485
-573
-518
-sp7-special
-sp7-special
-1
-1
--1000
-
-SWITCH
-997
-209
-1114
-242
+INPUTBOX
+999
+210
+1067
+270
 sp5-special
-sp5-special
+5.0
 1
-1
--1000
+0
+Number
 
-SWITCH
+INPUTBOX
 834
 484
-951
-517
+901
+544
 sp9-special
-sp9-special
+9.0
 1
-1
--1000
+0
+Number
 
-SWITCH
-996
-481
-1120
-514
-sp10-special
-sp10-special
+INPUTBOX
+836
+208
+903
+268
+sp4-special
+4.0
 1
-1
--1000
+0
+Number
 
-SWITCH
-282
-486
-399
-519
-sp6-special
-sp6-special
+INPUTBOX
+653
+487
+723
+547
+sp8-special
+8.0
 1
+0
+Number
+
+INPUTBOX
+458
+484
+526
+544
+sp7-special
+7.0
 1
--1000
+0
+Number
+
+INPUTBOX
+651
+215
+719
+275
+sp3-special
+3.0
+1
+0
+Number
+
+INPUTBOX
+285
+484
+351
+544
+sp6-special
+6.0
+1
+0
+Number
 
 @#$#@#$#@
 @#$#@#$#@
