@@ -1,4 +1,4 @@
-globals [g-catsheets g-amc-deck g-freq-record g-reshuffle? g-discard g-cur-amcs
+globals [g-catsheets g-amc-deck g-freq-record g-reshuffle? g-cur-amcs
   g-attack-values g-effect-freq]
 turtles-own [category value rolling? special shuffle? cumulative?]
 
@@ -47,7 +47,6 @@ to setup
   set g-amc-deck shuffle sort turtles
   let #categories [category] of max-one-of turtles [category]
   set g-freq-record n-values #categories [0]
-  set g-discard []
   set g-cur-amcs []
   set g-reshuffle? false
   let #special-effects [special] of max-one-of turtles [special]
@@ -79,7 +78,6 @@ to draw [repetitions]
     evaluate
     if g-reshuffle? [
       set g-amc-deck shuffle sort turtles
-      set g-discard []
       set g-reshuffle? false
     ]
   ]
@@ -90,7 +88,6 @@ to draw-core
   if empty? g-amc-deck [
     set g-amc-deck shuffle sort turtles with [not member? category [8 9]
       or not member? self g-cur-amcs]
-    set g-discard []
     set g-reshuffle? false
   ]
   ask first g-amc-deck [
@@ -123,7 +120,6 @@ to evaluate
       ; ts-cur-amcs must be a single turtle! (todo: add check?)
       ask ts-cur-amcs with [not rolling?] [
         set g-cur-amcs (list self)
-        set g-discard sentence g-discard sort other ts-cur-amcs
       ]
     ]
   ]
@@ -153,7 +149,6 @@ to evaluate
     let sum-all-amcs sum-positive-amcs + sum-negative-amcs
     set g-attack-values lput sum-all-amcs g-attack-values
   ]
-  set g-discard (sentence g-discard g-cur-amcs)
   set g-cur-amcs []
 end
 
