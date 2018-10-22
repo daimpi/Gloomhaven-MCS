@@ -1,5 +1,5 @@
-globals [g-catsheets g-amc-deck g-freq-record g-reshuffle? g-discard]
-turtles-own [category value rolling? special shuffle?]
+globals [g-catsheets g-amc-deck g-freq-record g-reshuffle? g-discard g-cur-amcs]
+turtles-own [category value rolling? special shuffle? cumulative?]
 
 
 to reset
@@ -36,12 +36,15 @@ to setup
       set rolling? item 3 cur-catsheet
       set special item 4 cur-catsheet
       set shuffle? item 5 cur-catsheet
+      set cumulative? item 6 cur-catsheet
     ]
   ]
   set g-amc-deck shuffle sort turtles
   let #categories [category] of max-one-of turtles [category]
   set g-freq-record n-values #categories [0]
   set g-discard []
+  set g-cur-amcs []
+  set g-reshuffle? false
 end
 
 
@@ -78,83 +81,83 @@ end
 
 
 to-report standard_x0
-  ; category, #of cards, value, rolling?, special?, shuffle?
-  report (list 1 st_x0 0 false 0 true)
+  ; category, #of cards, value, rolling?, special?, shuffle?, cumulative?
+  report (list 1 st_x0 0 false 0 true false)
 end
 
 to-report standard_-2
-  report (list 2 st_-2 -2 false 0 false)
+  report (list 2 st_-2 -2 false 0 false false)
 end
 
 to-report standard_-1
-  report (list 3 st_-1 -1 false 0 false)
+  report (list 3 st_-1 -1 false 0 false false)
 end
 
 to-report standard_0
-  report (list 4 st_0 0 false 0 false)
+  report (list 4 st_0 0 false 0 false false)
 end
 
 to-report standard_+1
-  report (list 5 st_+1 1 false 0 false)
+  report (list 5 st_+1 1 false 0 false false)
 end
 
 to-report standard_+2
-  report (list 6 st_+2 2 false 0 false)
+  report (list 6 st_+2 2 false 0 false false)
 end
 
 to-report standard_x2
-  report (list 7 st_x2 0 false 0 true)
+  report (list 7 st_x2 0 false 0 true false)
 end
 
 to-report curse
-  report (list 8 curses 0 false 0 false)
+  report (list 8 curses 0 false 0 false false)
 end
 
 to-report bless
-    report (list 9 blesses 0 false 0 false)
+    report (list 9 blesses 0 false 0 false false)
 end
 
 
 
 ; special attack modifiers
 to-report special1
-  report (list 10 sp1-freq sp1-val sp1-roll sp1-special false)
+  report (list 10 sp1-freq sp1-val sp1-roll sp1-special false sp1-cum)
 end
 
 to-report special2
-  report (list 11 sp2-freq sp2-val sp2-roll sp2-special false)
+  report (list 11 sp2-freq sp2-val sp2-roll sp2-special false sp2-cum)
 end
 
 to-report special3
-  report (list 12 sp3-freq sp3-val sp3-roll sp3-special false)
+  report (list 12 sp3-freq sp3-val sp3-roll sp3-special false sp3-cum)
 end
 
 to-report special4
-  report (list 13 sp4-freq sp4-val sp4-roll sp4-special false)
+  report (list 13 sp4-freq sp4-val sp4-roll sp4-special false sp4-cum)
 end
 
 to-report special5
-  report (list 14 sp5-freq sp5-val sp5-roll sp5-special false)
+  report (list 14 sp5-freq sp5-val sp5-roll sp5-special false sp5-cum)
 end
 
 to-report special6
-  report (list 15 sp6-freq sp6-val sp6-roll sp7-special false)
+  report (list 15 sp6-freq sp6-val sp6-roll sp7-special false sp6-cum)
 end
 
 to-report special7
-  report (list 16 sp7-freq sp7-val sp7-roll sp7-special false)
+  report (list 16 sp7-freq sp7-val sp7-roll sp7-special false sp7-cum)
 end
 
 to-report special8
-  report (list 17 sp8-freq sp8-val sp8-roll sp8-special false)
+  report (list 17 sp8-freq sp8-val sp8-roll sp8-special false sp8-cum)
 end
 
 to-report special9
-  report (list 18 sp9-freq sp9-val sp9-roll sp9-special false)
+  report (list 18 sp9-freq sp9-val sp9-roll sp9-special false sp9-cum)
 end
 
 to-report special10
-  report (list 19 sp10-freq sp10-val sp10-roll sp10-special false)
+  report (list 19 sp10-freq sp10-val sp10-roll sp10-special false sp10-cum)
 end
 
 ; let draws sum g-freq-record print draws let dist map [x -> round ((x / draws) * 100)] g-freq-record print dist
@@ -195,7 +198,7 @@ base-damage
 base-damage
 1
 10
-2.0
+0.0
 1
 1
 NIL
@@ -228,7 +231,7 @@ INPUTBOX
 75
 333
 st_x0
-1.0
+0.0
 1
 0
 Number
@@ -239,7 +242,7 @@ INPUTBOX
 74
 395
 st_-2
-1.0
+0.0
 1
 0
 Number
@@ -250,7 +253,7 @@ INPUTBOX
 75
 458
 st_-1
-5.0
+0.0
 1
 0
 Number
@@ -261,7 +264,7 @@ INPUTBOX
 74
 521
 st_0
-6.0
+0.0
 1
 0
 Number
@@ -272,7 +275,7 @@ INPUTBOX
 73
 583
 st_+1
-5.0
+0.0
 1
 0
 Number
@@ -283,7 +286,7 @@ INPUTBOX
 72
 645
 st_+2
-1.0
+0.0
 1
 0
 Number
@@ -294,7 +297,7 @@ INPUTBOX
 73
 708
 st_x2
-1.0
+0.0
 1
 0
 Number
@@ -475,10 +478,10 @@ sp5-freq
 Number
 
 INPUTBOX
-287
-325
-337
-385
+296
+407
+346
+467
 sp6-freq
 0.0
 1
@@ -486,10 +489,10 @@ sp6-freq
 Number
 
 INPUTBOX
-460
-325
-510
-385
+469
+407
+519
+467
 sp7-freq
 0.0
 1
@@ -497,10 +500,10 @@ sp7-freq
 Number
 
 INPUTBOX
-655
-325
-705
-385
+664
+407
+714
+467
 sp8-freq
 0.0
 1
@@ -508,10 +511,10 @@ sp8-freq
 Number
 
 INPUTBOX
-833
-324
-883
-384
+842
+406
+892
+466
 sp9-freq
 0.0
 1
@@ -519,10 +522,10 @@ sp9-freq
 Number
 
 INPUTBOX
-998
-320
-1055
-380
+1007
+402
+1064
+462
 sp10-freq
 0.0
 1
@@ -563,10 +566,10 @@ sp5-val
 Number
 
 INPUTBOX
-287
-388
-337
-448
+296
+470
+346
+530
 sp6-val
 0.0
 1
@@ -574,10 +577,10 @@ sp6-val
 Number
 
 INPUTBOX
-458
-388
-508
-448
+467
+470
+517
+530
 sp7-val
 0.0
 1
@@ -585,10 +588,10 @@ sp7-val
 Number
 
 INPUTBOX
-655
-388
-705
-448
+664
+470
+714
+530
 sp8-val
 0.0
 1
@@ -596,10 +599,10 @@ sp8-val
 Number
 
 INPUTBOX
-834
-386
-884
-446
+843
+468
+893
+528
 sp9-val
 0.0
 1
@@ -607,10 +610,10 @@ sp9-val
 Number
 
 INPUTBOX
-998
-383
-1053
-444
+1007
+465
+1062
+526
 sp10-val
 0.0
 1
@@ -651,10 +654,10 @@ sp5-roll
 -1000
 
 SWITCH
-285
-450
-375
-483
+294
+532
+384
+565
 sp6-roll
 sp6-roll
 1
@@ -662,10 +665,10 @@ sp6-roll
 -1000
 
 SWITCH
-457
-449
-547
-482
+466
+531
+556
+564
 sp7-roll
 sp7-roll
 1
@@ -673,10 +676,10 @@ sp7-roll
 -1000
 
 SWITCH
-654
-451
-744
-484
+663
+533
+753
+566
 sp8-roll
 sp8-roll
 1
@@ -684,10 +687,10 @@ sp8-roll
 -1000
 
 SWITCH
-834
-447
-924
-480
+843
+529
+933
+562
 sp9-roll
 sp9-roll
 1
@@ -695,10 +698,10 @@ sp9-roll
 -1000
 
 SWITCH
-997
-446
-1087
-479
+1006
+528
+1096
+561
 sp10-roll
 sp10-roll
 1
@@ -711,7 +714,7 @@ INPUTBOX
 355
 283
 sp1-special
-1.0
+0.0
 1
 0
 Number
@@ -722,18 +725,18 @@ INPUTBOX
 532
 285
 sp2-special
-2.0
+0.0
 1
 0
 Number
 
 INPUTBOX
-999
-481
-1073
-541
+1008
+563
+1082
+623
 sp10-special
-10.0
+0.0
 1
 0
 Number
@@ -744,18 +747,18 @@ INPUTBOX
 1067
 270
 sp5-special
-5.0
+0.0
 1
 0
 Number
 
 INPUTBOX
-834
-484
-901
-544
+843
+566
+910
+626
 sp9-special
-9.0
+0.0
 1
 0
 Number
@@ -766,29 +769,29 @@ INPUTBOX
 903
 268
 sp4-special
-4.0
+0.0
 1
 0
 Number
 
 INPUTBOX
-653
-487
-723
-547
+662
+569
+732
+629
 sp8-special
-8.0
+0.0
 1
 0
 Number
 
 INPUTBOX
-458
-484
-526
-544
+467
+566
+535
+626
 sp7-special
-7.0
+0.0
 1
 0
 Number
@@ -799,21 +802,131 @@ INPUTBOX
 719
 275
 sp3-special
-3.0
+0.0
 1
 0
 Number
 
 INPUTBOX
-285
-484
-351
-544
+294
+566
+360
+626
 sp6-special
-6.0
+0.0
 1
 0
 Number
+
+SWITCH
+289
+285
+379
+318
+sp1-cum
+sp1-cum
+1
+1
+-1000
+
+SWITCH
+468
+288
+558
+321
+sp2-cum
+sp2-cum
+1
+1
+-1000
+
+SWITCH
+650
+279
+740
+312
+sp3-cum
+sp3-cum
+1
+1
+-1000
+
+SWITCH
+833
+272
+923
+305
+sp4-cum
+sp4-cum
+1
+1
+-1000
+
+SWITCH
+1002
+274
+1092
+307
+sp5-cum
+sp5-cum
+1
+1
+-1000
+
+SWITCH
+294
+629
+384
+662
+sp6-cum
+sp6-cum
+1
+1
+-1000
+
+SWITCH
+467
+633
+557
+666
+sp7-cum
+sp7-cum
+1
+1
+-1000
+
+SWITCH
+659
+634
+749
+667
+sp8-cum
+sp8-cum
+1
+1
+-1000
+
+SWITCH
+843
+629
+933
+662
+sp9-cum
+sp9-cum
+1
+1
+-1000
+
+SWITCH
+1009
+626
+1106
+659
+sp10-cum
+sp10-cum
+1
+1
+-1000
 
 @#$#@#$#@
 @#$#@#$#@
