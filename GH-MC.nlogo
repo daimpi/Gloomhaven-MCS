@@ -1,4 +1,5 @@
-globals [g-catsheets g-amc-deck g-freq-record g-reshuffle? g-discard g-cur-amcs]
+globals [g-catsheets g-amc-deck g-freq-record g-reshuffle? g-discard g-cur-amcs
+  g-attack-values g-effect-freq]
 turtles-own [category value rolling? special shuffle? cumulative?]
 
 
@@ -36,7 +37,11 @@ to setup
       set rolling? item 3 cur-catsheet
       set special item 4 cur-catsheet
       set shuffle? item 5 cur-catsheet
-      set cumulative? item 6 cur-catsheet
+      ifelse special > 0 [
+        set cumulative? item 6 cur-catsheet
+      ][
+        set cumulative? false
+      ]
     ]
   ]
   set g-amc-deck shuffle sort turtles
@@ -45,6 +50,9 @@ to setup
   set g-discard []
   set g-cur-amcs []
   set g-reshuffle? false
+  let #special-effects [special] of max-one-of turtles [special]
+  set g-effect-freq n-values #special-effects [0]
+  set g-attack-values []
 end
 
 
@@ -58,27 +66,96 @@ end
 
 
 
-to draw
-  let reshuffle? false
-  let cur-attack-cards []
-  ask first g-amc-deck [
-    set g-amc-deck but-first g-amc-deck
-    set cur-attack-cards lput self cur-attack-cards
-    if shuffle? or empty? g-amc-deck [
-     set reshuffle? true
+to draw [repetitions]
+  repeat repetitions [
+    ifelse attack-mode = "normal" [
+      draw-core
+    ][
+      repeat 2 [draw-core]
     ]
-    let mylistcat category - 1
-    set g-freq-record replace-item mylistcat g-freq-record (item mylistcat g-freq-record + 1)
-    if remove-bless-curse and (category = 8 or category = 9) [
-     die
+    while [not member? false map [x -> [rolling?] of x] g-cur-amcs] [
+      draw-core
     ]
-  ]
-  if reshuffle? [
-    set g-amc-deck shuffle sort turtles
+    evaluate
+    if g-reshuffle? [
+      set g-amc-deck shuffle sort turtles
+      set g-discard []
+      set g-reshuffle? false
+    ]
   ]
 end
 
 
+to draw-core
+  if empty? g-amc-deck [
+    set g-amc-deck shuffle sort turtles with [not member? category [8 9]
+      or not member? self g-cur-amcs]
+    set g-discard []
+    set g-reshuffle? false
+  ]
+  ask first g-amc-deck [
+    set g-cur-amcs lput self g-cur-amcs
+    set g-amc-deck but-first g-amc-deck
+    if shuffle? [
+     set g-reshuffle? true
+    ]
+    ; let mylistcat category - 1
+    ; set g-freq-record replace-item mylistcat g-freq-record (item mylistcat g-freq-record + 1)
+    ; if remove-bless-curse and (category = 8 or category = 9) [
+     ; die
+    ; ]
+  ]
+end
+
+
+to evaluate
+  ; if length g-cur-amcs = 1 [
+    ; stop
+  ; ]
+  ifelse length g-cur-amcs = 2 and not member? true map [x -> [rolling?] of x]
+    g-cur-amcs [
+    ; todo
+    ;fake code:
+    set g-cur-amcs but-first g-cur-amcs
+  ][
+    if attack-mode = "disadvantage" [
+      let ts-cur-amcs (turtle-set g-cur-amcs)
+      ; ts-cur-amcs must be a single turtle! (todo: add check?)
+      ask ts-cur-amcs with [not rolling?] [
+        set g-cur-amcs (list self)
+        set g-discard sentence g-discard sort other ts-cur-amcs
+      ]
+    ]
+  ]
+  let ts-cur-amcs (turtle-set g-cur-amcs)
+  ; determine the attacks special effects
+  ; empty agentsets create empty lists
+  let non-cum-amcs remove-duplicates [special] of ts-cur-amcs with [
+    special > 0 and not cumulative?]
+  let cum-amcs [special] of ts-cur-amcs with [cumulative?]
+  let amc-effects (sentence cum-amcs non-cum-amcs)
+  ; apply the attacks special effects
+  foreach amc-effects [cur-effect ->
+    let cur-position cur-effect - 1
+    set g-effect-freq replace-item cur-position g-effect-freq
+      (item cur-position g-effect-freq + 1)
+  ]
+  ; apply the numerical modifiers
+  ifelse any? ts-cur-amcs with [member? category [1 8]] [
+    set g-attack-values lput 0 g-attack-values
+  ][
+    let sum-positive-amcs sum [value] of ts-cur-amcs with [value > 0]    
+    set sum-positive-amcs sum-positive-amcs + base-damage
+    if any? ts-cur-amcs with [member? category [7 9]] [
+      set sum-positive-amcs (sum-positive-amcs * 2)
+    ]
+    let sum-negative-amcs sum [value] of ts-cur-amcs with [value < 0]
+    let sum-all-amcs sum-positive-amcs + sum-negative-amcs
+    set g-attack-values lput sum-all-amcs g-attack-values
+  ]
+  set g-discard (sentence g-discard g-cur-amcs)
+  set g-cur-amcs []
+end
 
 to-report standard_x0
   ; category, #of cards, value, rolling?, special?, shuffle?, cumulative?
@@ -198,7 +275,7 @@ base-damage
 base-damage
 1
 10
-0.0
+2.0
 1
 1
 NIL
@@ -231,7 +308,7 @@ INPUTBOX
 75
 333
 st_x0
-0.0
+1.0
 1
 0
 Number
@@ -242,7 +319,7 @@ INPUTBOX
 74
 395
 st_-2
-0.0
+1.0
 1
 0
 Number
@@ -253,7 +330,7 @@ INPUTBOX
 75
 458
 st_-1
-0.0
+5.0
 1
 0
 Number
@@ -264,7 +341,7 @@ INPUTBOX
 74
 521
 st_0
-0.0
+6.0
 1
 0
 Number
@@ -275,7 +352,7 @@ INPUTBOX
 73
 583
 st_+1
-0.0
+5.0
 1
 0
 Number
@@ -286,7 +363,7 @@ INPUTBOX
 72
 645
 st_+2
-0.0
+1.0
 1
 0
 Number
@@ -297,7 +374,7 @@ INPUTBOX
 73
 708
 st_x2
-0.0
+1.0
 1
 0
 Number
