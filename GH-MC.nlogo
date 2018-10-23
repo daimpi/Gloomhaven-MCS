@@ -24,6 +24,7 @@ to reset
   set sp8-freq 0
   set sp9-freq 0
   set sp10-freq 0
+  set base-damage 2
 end
 
 
@@ -237,6 +238,21 @@ to make-plots
     plotxy cur-val item i freq-av
     set i i + 1
   ]
+  ; Cumulative Attack Value
+  set-current-plot "Cumulative Attack Values"
+  set-plot-x-range 0 max unique-av + 1
+  set-plot-y-range 0 100
+  let rev-freq-av reverse freq-av
+  set i length freq-av - 1
+  let cum-freq 0
+  foreach rev-freq-av [cur-freq ->
+    create-temporary-plot-pen (word i)
+    set-plot-pen-mode 1
+    set-plot-pen-interval 0.5
+    set cum-freq (cum-freq + cur-freq)
+    plotxy i cum-freq
+    set i i - 1
+  ]
   ; AMC Categories distribution
   set-current-plot "AMC Distribution"
   let #unique-amcs [category] of max-one-of turtles [category]
@@ -362,13 +378,13 @@ end
 GRAPHICS-WINDOW
 210
 10
-257
-58
+221
+22
 -1
 -1
-13.0
+1.0
 1
-10
+1
 1
 1
 1
@@ -387,25 +403,25 @@ ticks
 30.0
 
 SLIDER
-22
-117
-194
-150
+6
+113
+178
+146
 base-damage
 base-damage
 1
 10
-2.0
+5.0
 1
 1
 NIL
 HORIZONTAL
 
 SWITCH
-23
-158
+7
+154
+171
 187
-191
 remove-bless-curse
 remove-bless-curse
 1
@@ -413,20 +429,20 @@ remove-bless-curse
 -1000
 
 TEXTBOX
-28
-224
-103
-266
+79
+214
+154
+274
 Standard Attack Modifiers
-11
+16
 0.0
 1
 
 INPUTBOX
-25
-273
-75
-333
+46
+280
+96
+340
 st_x0
 1.0
 1
@@ -434,10 +450,10 @@ st_x0
 Number
 
 INPUTBOX
-24
-335
-74
-395
+45
+342
+95
+402
 st_-2
 1.0
 1
@@ -445,10 +461,10 @@ st_-2
 Number
 
 INPUTBOX
-25
-398
-75
-458
+46
+405
+96
+465
 st_-1
 5.0
 1
@@ -456,10 +472,10 @@ st_-1
 Number
 
 INPUTBOX
-24
-461
-74
-521
+45
+468
+95
+528
 st_0
 6.0
 1
@@ -467,10 +483,10 @@ st_0
 Number
 
 INPUTBOX
-23
-523
-73
-583
+44
+530
+94
+590
 st_+1
 5.0
 1
@@ -478,10 +494,10 @@ st_+1
 Number
 
 INPUTBOX
-22
-585
-72
-645
+43
+592
+93
+652
 st_+2
 1.0
 1
@@ -489,10 +505,10 @@ st_+2
 Number
 
 INPUTBOX
-23
-648
-73
-708
+44
+655
+94
+715
 st_x2
 1.0
 1
@@ -500,10 +516,10 @@ st_x2
 Number
 
 INPUTBOX
-22
-725
-72
-785
+43
+732
+93
+792
 curses
 0.0
 1
@@ -511,12 +527,12 @@ curses
 Number
 
 INPUTBOX
-22
-787
-72
-847
+43
+794
+93
+854
 blesses
-0.0
+5.0
 1
 0
 Number
@@ -556,20 +572,20 @@ NIL
 1
 
 TEXTBOX
-294
-25
-444
-43
+259
+10
+500
+50
 Special Attack Modifiers
-11
+16
 0.0
 1
 
 INPUTBOX
-291
-57
-341
-117
+225
+48
+275
+108
 sp1-freq
 0.0
 1
@@ -577,10 +593,10 @@ sp1-freq
 Number
 
 INPUTBOX
-290
-122
-350
-182
+224
+113
+284
+173
 sp1-val
 0.0
 1
@@ -588,10 +604,10 @@ sp1-val
 Number
 
 SWITCH
-289
-187
-392
-220
+223
+178
+326
+211
 sp1-roll
 sp1-roll
 1
@@ -599,20 +615,20 @@ sp1-roll
 -1000
 
 CHOOSER
-35
-64
-173
-109
+8
+62
+146
+107
 attack-mode
 attack-mode
 "advantage" "normal" "disadvantage"
 1
 
 INPUTBOX
-470
-55
-520
-115
+404
+46
+454
+106
 sp2-freq
 0.0
 1
@@ -620,10 +636,10 @@ sp2-freq
 Number
 
 INPUTBOX
-468
-121
-518
-181
+402
+112
+452
+172
 sp2-val
 0.0
 1
@@ -631,10 +647,10 @@ sp2-val
 Number
 
 SWITCH
-468
-187
-558
-220
+402
+178
+492
+211
 sp2-roll
 sp2-roll
 1
@@ -642,10 +658,10 @@ sp2-roll
 -1000
 
 INPUTBOX
-652
-50
-702
-110
+586
+41
+636
+101
 sp3-freq
 0.0
 1
@@ -653,10 +669,10 @@ sp3-freq
 Number
 
 INPUTBOX
-833
-45
-883
-105
+767
+36
+817
+96
 sp4-freq
 0.0
 1
@@ -664,10 +680,10 @@ sp4-freq
 Number
 
 INPUTBOX
-997
-49
-1047
-109
+931
+40
+981
+100
 sp5-freq
 0.0
 1
@@ -675,10 +691,10 @@ sp5-freq
 Number
 
 INPUTBOX
-293
-352
+227
 343
-412
+277
+403
 sp6-freq
 0.0
 1
@@ -686,10 +702,10 @@ sp6-freq
 Number
 
 INPUTBOX
-466
-352
-516
-412
+400
+343
+450
+403
 sp7-freq
 0.0
 1
@@ -697,10 +713,10 @@ sp7-freq
 Number
 
 INPUTBOX
-661
-352
-711
-412
+595
+343
+645
+403
 sp8-freq
 0.0
 1
@@ -708,10 +724,10 @@ sp8-freq
 Number
 
 INPUTBOX
-839
-351
-889
-411
+773
+342
+823
+402
 sp9-freq
 0.0
 1
@@ -719,10 +735,10 @@ sp9-freq
 Number
 
 INPUTBOX
-1004
-347
-1061
-407
+938
+338
+995
+398
 sp10-freq
 0.0
 1
@@ -730,10 +746,10 @@ sp10-freq
 Number
 
 INPUTBOX
-652
-113
-702
-173
+586
+104
+636
+164
 sp3-val
 0.0
 1
@@ -741,10 +757,10 @@ sp3-val
 Number
 
 INPUTBOX
-834
-109
-884
-169
+768
+100
+818
+160
 sp4-val
 0.0
 1
@@ -752,10 +768,10 @@ sp4-val
 Number
 
 INPUTBOX
-998
-111
-1048
-171
+932
+102
+982
+162
 sp5-val
 0.0
 1
@@ -763,10 +779,10 @@ sp5-val
 Number
 
 INPUTBOX
-293
-415
-343
-475
+227
+406
+277
+466
 sp6-val
 0.0
 1
@@ -774,10 +790,10 @@ sp6-val
 Number
 
 INPUTBOX
-464
-415
-514
-475
+398
+406
+448
+466
 sp7-val
 0.0
 1
@@ -785,10 +801,10 @@ sp7-val
 Number
 
 INPUTBOX
-661
-415
-711
-475
+595
+406
+645
+466
 sp8-val
 0.0
 1
@@ -796,10 +812,10 @@ sp8-val
 Number
 
 INPUTBOX
-840
-413
-890
-473
+774
+404
+824
+464
 sp9-val
 0.0
 1
@@ -807,10 +823,10 @@ sp9-val
 Number
 
 INPUTBOX
-1004
-410
-1059
-471
+938
+401
+993
+462
 sp10-val
 0.0
 1
@@ -818,10 +834,10 @@ sp10-val
 Number
 
 SWITCH
-651
-178
-741
-211
+585
+169
+675
+202
 sp3-roll
 sp3-roll
 1
@@ -829,10 +845,10 @@ sp3-roll
 -1000
 
 SWITCH
-833
-172
-923
-205
+767
+163
+857
+196
 sp4-roll
 sp4-roll
 1
@@ -840,10 +856,10 @@ sp4-roll
 -1000
 
 SWITCH
-998
-175
-1088
-208
+932
+166
+1022
+199
 sp5-roll
 sp5-roll
 1
@@ -851,10 +867,10 @@ sp5-roll
 -1000
 
 SWITCH
-291
-477
-381
-510
+225
+468
+315
+501
 sp6-roll
 sp6-roll
 1
@@ -862,10 +878,10 @@ sp6-roll
 -1000
 
 SWITCH
-463
-476
-553
-509
+397
+467
+487
+500
 sp7-roll
 sp7-roll
 1
@@ -873,10 +889,10 @@ sp7-roll
 -1000
 
 SWITCH
-660
-478
-750
-511
+594
+469
+684
+502
 sp8-roll
 sp8-roll
 1
@@ -884,10 +900,10 @@ sp8-roll
 -1000
 
 SWITCH
-840
-474
-930
-507
+774
+465
+864
+498
 sp9-roll
 sp9-roll
 1
@@ -895,10 +911,10 @@ sp9-roll
 -1000
 
 SWITCH
-1003
-473
-1093
-506
+937
+464
+1027
+497
 sp10-roll
 sp10-roll
 1
@@ -906,10 +922,10 @@ sp10-roll
 -1000
 
 INPUTBOX
-290
-223
-355
-283
+224
+214
+289
+274
 sp1-special
 0.0
 1
@@ -917,10 +933,10 @@ sp1-special
 Number
 
 INPUTBOX
-468
-225
-532
-285
+402
+216
+466
+276
 sp2-special
 0.0
 1
@@ -928,10 +944,10 @@ sp2-special
 Number
 
 INPUTBOX
-1005
-508
-1079
-568
+939
+499
+1013
+559
 sp10-special
 0.0
 1
@@ -939,10 +955,10 @@ sp10-special
 Number
 
 INPUTBOX
-999
-210
-1067
-270
+933
+201
+1001
+261
 sp5-special
 0.0
 1
@@ -950,10 +966,10 @@ sp5-special
 Number
 
 INPUTBOX
-840
-511
-907
-571
+774
+502
+841
+562
 sp9-special
 0.0
 1
@@ -961,10 +977,10 @@ sp9-special
 Number
 
 INPUTBOX
-836
-208
-903
-268
+770
+199
+837
+259
 sp4-special
 0.0
 1
@@ -972,10 +988,10 @@ sp4-special
 Number
 
 INPUTBOX
-659
-514
-729
-574
+593
+505
+663
+565
 sp8-special
 0.0
 1
@@ -983,10 +999,10 @@ sp8-special
 Number
 
 INPUTBOX
-464
-511
-532
-571
+398
+502
+466
+562
 sp7-special
 0.0
 1
@@ -994,10 +1010,10 @@ sp7-special
 Number
 
 INPUTBOX
-651
-215
-719
-275
+585
+206
+653
+266
 sp3-special
 0.0
 1
@@ -1005,10 +1021,10 @@ sp3-special
 Number
 
 INPUTBOX
+225
+502
 291
-511
-357
-571
+562
 sp6-special
 0.0
 1
@@ -1016,10 +1032,10 @@ sp6-special
 Number
 
 SWITCH
-289
-285
-379
-318
+223
+276
+313
+309
 sp1-cum
 sp1-cum
 1
@@ -1027,21 +1043,21 @@ sp1-cum
 -1000
 
 SWITCH
-468
-288
-558
-321
-sp2-cum
-sp2-cum
-1
-1
--1000
-
-SWITCH
-650
+402
 279
-740
+492
 312
+sp2-cum
+sp2-cum
+1
+1
+-1000
+
+SWITCH
+584
+270
+674
+303
 sp3-cum
 sp3-cum
 1
@@ -1049,10 +1065,10 @@ sp3-cum
 -1000
 
 SWITCH
-833
-272
-923
-305
+767
+263
+857
+296
 sp4-cum
 sp4-cum
 1
@@ -1060,10 +1076,10 @@ sp4-cum
 -1000
 
 SWITCH
-1002
-274
-1092
-307
+936
+265
+1026
+298
 sp5-cum
 sp5-cum
 1
@@ -1071,10 +1087,10 @@ sp5-cum
 -1000
 
 SWITCH
-291
-574
-381
-607
+225
+561
+315
+594
 sp6-cum
 sp6-cum
 1
@@ -1082,10 +1098,10 @@ sp6-cum
 -1000
 
 SWITCH
-464
-578
-554
-611
+398
+565
+488
+598
 sp7-cum
 sp7-cum
 1
@@ -1093,10 +1109,10 @@ sp7-cum
 -1000
 
 SWITCH
-656
-579
-746
-612
+590
+566
+680
+599
 sp8-cum
 sp8-cum
 1
@@ -1104,35 +1120,35 @@ sp8-cum
 -1000
 
 SWITCH
-840
-574
-930
-607
-sp9-cum
-sp9-cum
-1
-1
--1000
-
-SWITCH
-1006
-571
-1103
-604
-sp10-cum
-sp10-cum
-1
-1
--1000
-
-PLOT
-98
-628
-479
 774
+561
+864
+594
+sp9-cum
+sp9-cum
+1
+1
+-1000
+
+SWITCH
+940
+562
+1037
+595
+sp10-cum
+sp10-cum
+1
+1
+-1000
+
+PLOT
+149
+667
+530
+813
 Attack Values
-NIL
-NIL
+Attack value
+Probability
 0.0
 10.0
 0.0
@@ -1143,13 +1159,13 @@ false
 PENS
 
 PLOT
-496
-627
-871
-777
+1065
+46
+1363
+196
 AMC Distribution
-NIL
-NIL
+Amc category
+Probability
 0.0
 10.0
 0.0
@@ -1160,13 +1176,13 @@ false
 PENS
 
 PLOT
-900
-631
-1172
-781
+1064
+210
+1336
+360
 Special Effect Frequency
-NIL
-NIL
+Special effect id
+Probability
 0.0
 10.0
 0.0
@@ -1175,6 +1191,223 @@ true
 false
 "" ""
 PENS
+
+PLOT
+567
+668
+948
+818
+Cumulative Attack Values
+Attack value >=
+Probability
+0.0
+10.0
+0.0
+10.0
+true
+false
+"" ""
+PENS
+
+TEXTBOX
+21
+301
+36
+321
+1
+16
+105.0
+1
+
+TEXTBOX
+21
+362
+36
+380
+2
+16
+105.0
+1
+
+TEXTBOX
+21
+419
+36
+439
+3
+16
+105.0
+1
+
+TEXTBOX
+25
+484
+40
+504
+4
+16
+105.0
+1
+
+TEXTBOX
+21
+544
+36
+564
+5
+16
+105.0
+1
+
+TEXTBOX
+21
+605
+36
+625
+6
+16
+105.0
+1
+
+TEXTBOX
+21
+667
+36
+687
+7
+16
+105.0
+1
+
+TEXTBOX
+22
+745
+37
+765
+8
+16
+105.0
+1
+
+TEXTBOX
+21
+809
+36
+829
+9
+16
+105.0
+1
+
+TEXTBOX
+199
+56
+221
+74
+10
+16
+105.0
+1
+
+TEXTBOX
+377
+60
+396
+78
+11
+16
+105.0
+1
+
+TEXTBOX
+552
+59
+576
+79
+12
+16
+105.0
+1
+
+TEXTBOX
+740
+56
+760
+76
+13
+16
+105.0
+1
+
+TEXTBOX
+906
+59
+925
+79
+14
+16
+105.0
+1
+
+TEXTBOX
+202
+348
+225
+368
+15
+16
+105.0
+1
+
+TEXTBOX
+375
+362
+396
+382
+16
+16
+105.0
+1
+
+TEXTBOX
+572
+362
+595
+382
+17
+16
+105.0
+1
+
+TEXTBOX
+748
+368
+769
+388
+18
+16
+105.0
+1
+
+TEXTBOX
+913
+360
+934
+380
+19
+16
+105.0
+1
+
+TEXTBOX
+8
+211
+98
+284
+Amc category\n(in blue)
+16
+105.0
+1
 
 @#$#@#$#@
 # UNDER CONSTRUCTION  
