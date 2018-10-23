@@ -88,7 +88,7 @@ to draw [repetitions]
       set g-reshuffle? false
     ]
   ]
-  prepare-plot-data
+  make-plots
   tick
 end
 
@@ -216,10 +216,13 @@ end
 
 
 
-to prepare-plot-data
+to make-plots
+  ; attack-values plot
+  set-current-plot "Attack Values"
   let #draws length g-attack-values
   let sorted-av sort g-attack-values
   let unique-av remove-duplicates sorted-av
+  set-plot-x-range 0 max unique-av + 1
   let freq-av []
   foreach unique-av [cur-val ->
     set freq-av lput length filter [x -> x = cur-val] sorted-av freq-av
@@ -227,8 +230,10 @@ to prepare-plot-data
   set freq-av map [x -> (round ((x / #draws) * 100))] freq-av
   let i 0
   foreach unique-av [cur-val ->
-    let tmp-val-list n-values item i freq-av [cur-val]
-    set g-plot-attack-values (sentence g-plot-attack-values tmp-val-list)
+    create-temporary-plot-pen (word cur-val)
+    set-plot-pen-mode 1
+    set-plot-pen-interval 0.5
+    plotxy cur-val item i freq-av
     set i i + 1
   ]
 end
@@ -635,10 +640,10 @@ sp5-freq
 Number
 
 INPUTBOX
-296
-407
-346
-467
+293
+352
+343
+412
 sp6-freq
 0.0
 1
@@ -646,10 +651,10 @@ sp6-freq
 Number
 
 INPUTBOX
-469
-407
-519
-467
+466
+352
+516
+412
 sp7-freq
 0.0
 1
@@ -657,10 +662,10 @@ sp7-freq
 Number
 
 INPUTBOX
-664
-407
-714
-467
+661
+352
+711
+412
 sp8-freq
 0.0
 1
@@ -668,10 +673,10 @@ sp8-freq
 Number
 
 INPUTBOX
-842
-406
-892
-466
+839
+351
+889
+411
 sp9-freq
 0.0
 1
@@ -679,10 +684,10 @@ sp9-freq
 Number
 
 INPUTBOX
-1007
-402
-1064
-462
+1004
+347
+1061
+407
 sp10-freq
 0.0
 1
@@ -723,10 +728,10 @@ sp5-val
 Number
 
 INPUTBOX
-296
-470
-346
-530
+293
+415
+343
+475
 sp6-val
 0.0
 1
@@ -734,10 +739,10 @@ sp6-val
 Number
 
 INPUTBOX
-467
-470
-517
-530
+464
+415
+514
+475
 sp7-val
 0.0
 1
@@ -745,10 +750,10 @@ sp7-val
 Number
 
 INPUTBOX
-664
-470
-714
-530
+661
+415
+711
+475
 sp8-val
 0.0
 1
@@ -756,10 +761,10 @@ sp8-val
 Number
 
 INPUTBOX
-843
-468
-893
-528
+840
+413
+890
+473
 sp9-val
 0.0
 1
@@ -767,10 +772,10 @@ sp9-val
 Number
 
 INPUTBOX
-1007
-465
-1062
-526
+1004
+410
+1059
+471
 sp10-val
 0.0
 1
@@ -811,10 +816,10 @@ sp5-roll
 -1000
 
 SWITCH
-294
-532
-384
-565
+291
+477
+381
+510
 sp6-roll
 sp6-roll
 1
@@ -822,10 +827,10 @@ sp6-roll
 -1000
 
 SWITCH
-466
-531
-556
-564
+463
+476
+553
+509
 sp7-roll
 sp7-roll
 1
@@ -833,10 +838,10 @@ sp7-roll
 -1000
 
 SWITCH
-663
-533
-753
-566
+660
+478
+750
+511
 sp8-roll
 sp8-roll
 1
@@ -844,10 +849,10 @@ sp8-roll
 -1000
 
 SWITCH
-843
-529
-933
-562
+840
+474
+930
+507
 sp9-roll
 sp9-roll
 1
@@ -855,10 +860,10 @@ sp9-roll
 -1000
 
 SWITCH
-1006
-528
-1096
-561
+1003
+473
+1093
+506
 sp10-roll
 sp10-roll
 1
@@ -888,10 +893,10 @@ sp2-special
 Number
 
 INPUTBOX
-1008
-563
-1082
-623
+1005
+508
+1079
+568
 sp10-special
 0.0
 1
@@ -910,10 +915,10 @@ sp5-special
 Number
 
 INPUTBOX
-843
-566
-910
-626
+840
+511
+907
+571
 sp9-special
 0.0
 1
@@ -932,10 +937,10 @@ sp4-special
 Number
 
 INPUTBOX
-662
-569
-732
-629
+659
+514
+729
+574
 sp8-special
 0.0
 1
@@ -943,10 +948,10 @@ sp8-special
 Number
 
 INPUTBOX
-467
-566
-535
-626
+464
+511
+532
+571
 sp7-special
 0.0
 1
@@ -965,10 +970,10 @@ sp3-special
 Number
 
 INPUTBOX
-294
-566
-360
-626
+291
+511
+357
+571
 sp6-special
 0.0
 1
@@ -1031,10 +1036,10 @@ sp5-cum
 -1000
 
 SWITCH
-294
-629
-384
-662
+291
+574
+381
+607
 sp6-cum
 sp6-cum
 1
@@ -1042,10 +1047,10 @@ sp6-cum
 -1000
 
 SWITCH
-467
-633
-557
-666
+464
+578
+554
+611
 sp7-cum
 sp7-cum
 1
@@ -1053,10 +1058,10 @@ sp7-cum
 -1000
 
 SWITCH
-659
-634
-749
-667
+656
+579
+746
+612
 sp8-cum
 sp8-cum
 1
@@ -1064,10 +1069,10 @@ sp8-cum
 -1000
 
 SWITCH
-843
-629
-933
-662
+840
+574
+930
+607
 sp9-cum
 sp9-cum
 1
@@ -1075,10 +1080,10 @@ sp9-cum
 -1000
 
 SWITCH
-1009
-626
-1106
-659
+1006
+571
+1103
+604
 sp10-cum
 sp10-cum
 1
@@ -1086,10 +1091,10 @@ sp10-cum
 -1000
 
 PLOT
-322
-703
-692
-849
+98
+628
+479
+774
 Attack Values
 NIL
 NIL
@@ -1099,9 +1104,42 @@ NIL
 10.0
 true
 false
-"" "if g-plot-attack-values != 0 and not empty? g-plot-attack-values [\n  set-plot-x-range 0 max g-plot-attack-values + 1\n]"
+"" ""
 PENS
-"default" 0.5 1 -16777216 true "" "histogram g-plot-attack-values"
+
+PLOT
+496
+627
+871
+777
+AMC Distribution
+NIL
+NIL
+0.0
+10.0
+0.0
+10.0
+true
+false
+"" ""
+PENS
+
+PLOT
+900
+631
+1172
+781
+Special Effect Frequency
+NIL
+NIL
+0.0
+10.0
+0.0
+10.0
+true
+false
+"" ""
+PENS
 
 @#$#@#$#@
 # UNDER CONSTRUCTION  
