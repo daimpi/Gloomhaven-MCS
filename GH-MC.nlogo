@@ -1,5 +1,5 @@
 globals [g-catsheets g-amc-deck g-freq-record g-reshuffle? g-cur-amcs
-  g-attack-values g-effect-freq g-bless-curse-discard]
+  g-attack-values g-effect-freq g-bless-curse-discard g-plot-attack-values]
 turtles-own [category value rolling? special shuffle? cumulative?]
 
 
@@ -52,6 +52,7 @@ to setup
   set g-effect-freq n-values 10 [0]
   set g-attack-values []
   set g-bless-curse-discard []
+  set g-plot-attack-values []
   reset-ticks
 end
 
@@ -87,6 +88,7 @@ to draw [repetitions]
       set g-reshuffle? false
     ]
   ]
+  prepare-plot-data
   tick
 end
 
@@ -208,6 +210,15 @@ to evaluate
         (item mylistcat g-freq-record + 1)
   ]
   set g-cur-amcs []
+end
+
+
+
+
+
+to prepare-plot-data
+  let #draws length g-attack-values
+  set g-plot-attack-values (map - (g-attack-values) (n-values #draws [0.5]))
 end
 
 
@@ -1076,9 +1087,9 @@ NIL
 10.0
 true
 false
-"" "if g-attack-values != 0 and not empty? g-attack-values [\n  set-plot-x-range 0 max g-attack-values + 1\n]"
+"" "if g-plot-attack-values != 0 and not empty? g-plot-attack-values [\n  set-plot-x-range -0.5 max g-plot-attack-values + 1\n]"
 PENS
-"default" 1.0 1 -16777216 true "" "histogram g-attack-values"
+"default" 1.0 1 -16777216 true "" "histogram g-plot-attack-values"
 
 @#$#@#$#@
 # UNDER CONSTRUCTION  
