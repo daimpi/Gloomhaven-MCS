@@ -1,5 +1,5 @@
 globals [g-catsheets g-amc-deck g-freq-record g-reshuffle? g-cur-amcs
-  g-attack-values g-effect-freq]
+  g-attack-values g-effect-freq g-bless-curse-discard]
 turtles-own [category value rolling? special shuffle? cumulative?]
 
 
@@ -45,13 +45,13 @@ to setup
     ]
   ]
   set g-amc-deck shuffle sort turtles
-  let #categories [category] of max-one-of turtles [category]
+  let #categories length g-catsheets
   set g-freq-record n-values #categories [0]
   set g-cur-amcs []
   set g-reshuffle? false
-  let #special-effects [special] of max-one-of turtles [special]
-  set g-effect-freq n-values #special-effects [0]
+  set g-effect-freq n-values 10 [0]
   set g-attack-values []
+  set g-bless-curse-discard []
   reset-ticks
 end
 
@@ -78,9 +78,9 @@ to draw [repetitions]
     ]
     evaluate
     if remove-bless-curse [
-      let to-remove-amcs turtles with [(category = 8 or category = 9) and not
-        member? self g-amc-deck]
-      ask to-remove-amcs [die]
+      foreach g-bless-curse-discard [bc-amc ->
+        ask bc-amc [die]
+      ]
     ]
     if g-reshuffle? [
       set g-amc-deck shuffle sort turtles
@@ -93,8 +93,8 @@ end
 
 to draw-core
   if empty? g-amc-deck [
-    set g-amc-deck shuffle sort turtles with [not member? category [8 9]
-      or not member? self g-cur-amcs]
+    ; don't reshuffle discarded blesses/curses
+    set g-amc-deck shuffle sort turtles with [not member? category [8 9]]
     set g-reshuffle? false
   ]
   ask first g-amc-deck [
@@ -103,11 +103,9 @@ to draw-core
     if shuffle? [
      set g-reshuffle? true
     ]
-    ; let mylistcat category - 1
-    ; set g-freq-record replace-item mylistcat g-freq-record (item mylistcat g-freq-record + 1)
-    ; if remove-bless-curse and (category = 8 or category = 9) [
-     ; die
-    ; ]
+    if remove-bless-curse and member? category [8 9] [
+      set g-bless-curse-discard lput self g-bless-curse-discard
+    ]
   ]
 end
 
@@ -198,7 +196,16 @@ to evaluate
     ]
     let sum-negative-amcs sum [value] of ts-cur-amcs with [value < 0]
     let sum-all-amcs sum-positive-amcs + sum-negative-amcs
+    if sum-all-amcs < 0 [
+      set sum-all-amcs 0
+    ]
     set g-attack-values lput sum-all-amcs g-attack-values
+  ]
+  ; record each applied amc
+  ask ts-cur-amcs [
+    let mylistcat category - 1
+      set g-freq-record replace-item mylistcat g-freq-record 
+        (item mylistcat g-freq-record + 1)
   ]
   set g-cur-amcs []
 end
@@ -287,7 +294,7 @@ to-report special10
   report (list 19 sp10-freq sp10-val sp10-roll sp10-special false sp10-cum)
 end
 
-;setup draw 1000000 show mean g-attack-values let draws length g-attack-values let dist map [x -> (round ((x / draws) * 10000)) / 100] g-effect-freq print dist
+;setup draw 1000000 show mean g-attack-values let draws length g-attack-values let dist map [x -> (round ((x / draws) * 10000)) / 100] g-effect-freq print dist print map [x -> (round ((x / draws) * 10000)) / 100] g-freq-record
 @#$#@#$#@
 GRAPHICS-WINDOW
 210
