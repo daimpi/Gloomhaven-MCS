@@ -204,7 +204,7 @@ to evaluate
   ; record each applied amc
   ask ts-cur-amcs [
     let mylistcat category - 1
-      set g-freq-record replace-item mylistcat g-freq-record 
+      set g-freq-record replace-item mylistcat g-freq-record
         (item mylistcat g-freq-record + 1)
   ]
   set g-cur-amcs []
@@ -1061,6 +1061,24 @@ sp10-cum
 1
 1
 -1000
+
+PLOT
+322
+703
+692
+849
+Attack values
+NIL
+NIL
+0.0
+11.0
+0.0
+10.0
+true
+false
+"" "if g-attack-values != 0 and not empty? g-attack-values [\n  set-plot-x-range 0 max g-attack-values + 1\n]"
+PENS
+"default" 1.0 1 -16777216 true "" "histogram g-attack-values"
 
 @#$#@#$#@
 # UNDER CONSTRUCTION  
