@@ -52,6 +52,7 @@ to setup
   let #special-effects [special] of max-one-of turtles [special]
   set g-effect-freq n-values #special-effects [0]
   set g-attack-values []
+  reset-ticks
 end
 
 
@@ -76,11 +77,17 @@ to draw [repetitions]
       draw-core
     ]
     evaluate
+    if remove-bless-curse [
+      let to-remove-amcs turtles with [(category = 8 or category = 9) and not 
+        member? self g-amc-deck]
+      ask to-remove-amcs [die]
+    ]
     if g-reshuffle? [
       set g-amc-deck shuffle sort turtles
       set g-reshuffle? false
     ]
   ]
+  tick
 end
 
 
@@ -106,19 +113,63 @@ end
 
 
 to evaluate
-  ; if length g-cur-amcs = 1 [
-    ; stop
-  ; ]
   ifelse length g-cur-amcs = 2 and not member? true map [x -> [rolling?] of x]
     g-cur-amcs [
-    ; todo
-    ;fake code:
-    set g-cur-amcs but-first g-cur-amcs
+    let ts-cur-amcs (turtle-set g-cur-amcs)
+    let ambiguous? false
+    let better-amc 0
+    ifelse [special] of item 0 g-cur-amcs > 0 and 
+      [special] of item 1 g-cur-amcs > 0 [
+      set g-cur-amcs but-last g-cur-amcs
+      set ambiguous? true
+    ][
+      ; any x0 amcs?
+      ifelse any? ts-cur-amcs with [member? category [1 8]] [
+        ask one-of ts-cur-amcs with [member? category [1 8]] [
+          set better-amc other ts-cur-amcs
+        ]
+      ][
+        let x2amc-to-reset no-turtles
+        let x2amc one-of ts-cur-amcs with [member? category [7 9]]
+        if x2amc != nobody [
+          ask x2amc [
+            set value base-damage * 2
+            set x2amc-to-reset self
+          ]
+        ]
+        let special-amc one-of ts-cur-amcs with [special > 0]
+        ifelse special-amc != nobody [
+          ask special-amc [
+            let other-amc other ts-cur-amcs
+            ifelse value >= first [value] of other-amc [
+              set better-amc self
+              set ambiguous? false
+            ][
+              set g-cur-amcs but-last g-cur-amcs
+              set ambiguous? true
+            ]
+          ]
+        ][
+          set better-amc max-one-of ts-cur-amcs [value]
+          set ambiguous? false
+        ]
+        ask x2amc-to-reset [set value 0]
+      ]
+    ]
+    if not ambiguous? [
+      ask better-amc [
+        ifelse attack-mode = "advantage" [
+          set g-cur-amcs (list self)
+        ][
+          set g-cur-amcs (list other ts-cur-amcs)
+        ]
+      ]
+    ]
   ][
     if attack-mode = "disadvantage" [
       let ts-cur-amcs (turtle-set g-cur-amcs)
-      ; ts-cur-amcs must be a single turtle! (todo: add check?)
       ask ts-cur-amcs with [not rolling?] [
+        ; g-cur-amcs should be a single turtle! (todo: add check?)
         set g-cur-amcs (list self)
       ]
     ]
@@ -151,6 +202,10 @@ to evaluate
   ]
   set g-cur-amcs []
 end
+
+
+
+
 
 to-report standard_x0
   ; category, #of cards, value, rolling?, special?, shuffle?, cumulative?
@@ -232,7 +287,7 @@ to-report special10
   report (list 19 sp10-freq sp10-val sp10-roll sp10-special false sp10-cum)
 end
 
-; let draws sum g-freq-record print draws let dist map [x -> round ((x / draws) * 100)] g-freq-record print dist
+;setup draw 1000000 show mean g-attack-values let draws length g-attack-values let dist map [x -> (round ((x / draws) * 10000)) / 100] g-effect-freq print dist
 @#$#@#$#@
 GRAPHICS-WINDOW
 210
