@@ -78,7 +78,7 @@ to draw [repetitions]
     ]
     evaluate
     if remove-bless-curse [
-      let to-remove-amcs turtles with [(category = 8 or category = 9) and not 
+      let to-remove-amcs turtles with [(category = 8 or category = 9) and not
         member? self g-amc-deck]
       ask to-remove-amcs [die]
     ]
@@ -118,7 +118,7 @@ to evaluate
     let ts-cur-amcs (turtle-set g-cur-amcs)
     let ambiguous? false
     let better-amc 0
-    ifelse [special] of item 0 g-cur-amcs > 0 and 
+    ifelse [special] of item 0 g-cur-amcs > 0 and
       [special] of item 1 g-cur-amcs > 0 [
       set g-cur-amcs but-last g-cur-amcs
       set ambiguous? true
@@ -191,7 +191,7 @@ to evaluate
   ifelse any? ts-cur-amcs with [member? category [1 8]] [
     set g-attack-values lput 0 g-attack-values
   ][
-    let sum-positive-amcs sum [value] of ts-cur-amcs with [value > 0]    
+    let sum-positive-amcs sum [value] of ts-cur-amcs with [value > 0]
     set sum-positive-amcs sum-positive-amcs + base-damage
     if any? ts-cur-amcs with [member? category [7 9]] [
       set sum-positive-amcs (sum-positive-amcs * 2)
@@ -1056,6 +1056,9 @@ sp10-cum
 -1000
 
 @#$#@#$#@
+# UNDER CONSTRUCTION  
+
+Work in progress
 @#$#@#$#@
 default
 true
