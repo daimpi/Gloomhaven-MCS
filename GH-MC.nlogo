@@ -82,6 +82,7 @@ to draw [repetitions]
       foreach g-bless-curse-discard [bc-amc ->
         ask bc-amc [die]
       ]
+      set g-bless-curse-discard []
     ]
     if g-reshuffle? [
       set g-amc-deck shuffle sort turtles
@@ -217,7 +218,7 @@ end
 
 
 to make-plots
-  ; attack-values plot
+  ; Attack Value distribution
   set-current-plot "Attack Values"
   let #draws length g-attack-values
   let sorted-av sort g-attack-values
@@ -235,6 +236,40 @@ to make-plots
     set-plot-pen-interval 0.5
     plotxy cur-val item i freq-av
     set i i + 1
+  ]
+  ; AMC Categories distribution
+  set-current-plot "AMC Distribution"
+  let #unique-amcs [category] of max-one-of turtles [category]
+  if #unique-amcs > 0 [
+    set-plot-x-range 1 #unique-amcs + 1
+    let freq-amcs map [x -> (round ((x / #draws) * 100))] g-freq-record
+    set i 1
+    foreach freq-amcs [cur-freq ->
+      if cur-freq > 0 [
+      create-temporary-plot-pen (word i)
+      set-plot-pen-mode 1
+      set-plot-pen-interval 0.5
+      plotxy i cur-freq
+      ]
+      set i i + 1
+    ]
+  ]
+  ; Special Effect distribution
+  set-current-plot "Special Effect Frequency"
+  let #unique-se [special] of max-one-of turtles [special]
+  if #unique-se > 0 [
+    set-plot-x-range 1 #unique-se + 1
+    let freq-se map [x -> (round ((x / #draws) * 100))] g-effect-freq
+    set i 1
+    foreach freq-se [cur-freq ->
+      if cur-freq > 0 [
+      create-temporary-plot-pen (word i)
+      set-plot-pen-mode 1
+      set-plot-pen-interval 0.5
+      plotxy i cur-freq
+      ]
+      set i i + 1
+    ]
   ]
 end
 
