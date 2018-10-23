@@ -554,7 +554,7 @@ CHOOSER
 attack-mode
 attack-mode
 "advantage" "normal" "disadvantage"
-1
+0
 
 INPUTBOX
 470
@@ -1082,14 +1082,14 @@ Attack values
 NIL
 NIL
 0.0
-11.0
+10.0
 0.0
 10.0
 true
 false
-"" "if g-plot-attack-values != 0 and not empty? g-plot-attack-values [\n  set-plot-x-range -0.5 max g-plot-attack-values + 1\n]"
+"" "if g-attack-values != 0 and not empty? g-attack-values [\n  set-plot-x-range 0 max g-attack-values + 1\n]"
 PENS
-"default" 1.0 1 -16777216 true "" "histogram g-plot-attack-values"
+"default" 0.5 1 -16777216 true "" "histogram g-attack-values"
 
 @#$#@#$#@
 # UNDER CONSTRUCTION  
