@@ -218,7 +218,19 @@ end
 
 to prepare-plot-data
   let #draws length g-attack-values
-  set g-plot-attack-values (map - (g-attack-values) (n-values #draws [0.5]))
+  let sorted-av sort g-attack-values
+  let unique-av remove-duplicates sorted-av
+  let freq-av []
+  foreach unique-av [cur-val ->
+    set freq-av lput length filter [x -> x = cur-val] sorted-av freq-av
+  ]
+  set freq-av map [x -> (round ((x / #draws) * 100))] freq-av
+  let i 0
+  foreach unique-av [cur-val ->
+    let tmp-val-list n-values item i freq-av [cur-val]
+    set g-plot-attack-values (sentence g-plot-attack-values tmp-val-list)
+    set i i + 1
+  ]
 end
 
 
@@ -554,7 +566,7 @@ CHOOSER
 attack-mode
 attack-mode
 "advantage" "normal" "disadvantage"
-0
+1
 
 INPUTBOX
 470
@@ -1078,7 +1090,7 @@ PLOT
 703
 692
 849
-Attack values
+Attack Values
 NIL
 NIL
 0.0
@@ -1087,9 +1099,9 @@ NIL
 10.0
 true
 false
-"" "if g-attack-values != 0 and not empty? g-attack-values [\n  set-plot-x-range 0 max g-attack-values + 1\n]"
+"" "if g-plot-attack-values != 0 and not empty? g-plot-attack-values [\n  set-plot-x-range 0 max g-plot-attack-values + 1\n]"
 PENS
-"default" 0.5 1 -16777216 true "" "histogram g-attack-values"
+"default" 0.5 1 -16777216 true "" "histogram g-plot-attack-values"
 
 @#$#@#$#@
 # UNDER CONSTRUCTION  
