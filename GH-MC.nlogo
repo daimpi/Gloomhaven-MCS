@@ -229,6 +229,7 @@ to make-plots
   foreach unique-av [cur-val ->
     set freq-av lput length filter [x -> x = cur-val] sorted-av freq-av
   ]
+  let precise-freq-av freq-av
   set freq-av map [x -> (round ((x / #draws) * 100))] freq-av
   let i 0
   foreach unique-av [cur-val ->
@@ -242,7 +243,7 @@ to make-plots
   set-current-plot "Cumulative Attack Values"
   set-plot-x-range 0 max unique-av + 1
   set-plot-y-range 0 100
-  let rev-freq-av reverse freq-av
+  let rev-freq-av reverse precise-freq-av
   set i length freq-av - 1
   let cum-freq 0
   foreach rev-freq-av [cur-freq ->
@@ -250,7 +251,8 @@ to make-plots
     set-plot-pen-mode 1
     set-plot-pen-interval 0.5
     set cum-freq (cum-freq + cur-freq)
-    plotxy i cum-freq
+    let cum-freq-plot round ((cum-freq / #draws) * 100)
+    plotxy i cum-freq-plot
     set i i - 1
   ]
   ; AMC Categories distribution
@@ -411,7 +413,7 @@ base-damage
 base-damage
 1
 10
-5.0
+2.0
 1
 1
 NIL
@@ -532,7 +534,7 @@ INPUTBOX
 93
 854
 blesses
-5.0
+0.0
 1
 0
 Number
